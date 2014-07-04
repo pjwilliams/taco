@@ -1,0 +1,12 @@
+Except where otherwise stated, this code is licensed under version 2.1 of the
+LGPL.  See LICENSE.lgpl for details.
+
+Exceptions:
+
+1. The following files are from Chromium:
+
+  src/taco/base/string_piece.cc
+  src/taco/base/string_piece.h
+
+Chromium is licensed under a BSD-style license.  See LICENSE.chromium for
+details.
