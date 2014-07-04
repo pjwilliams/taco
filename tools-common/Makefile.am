@@ -1,6 +1,7 @@
 SUBDIRS = cli \
           compat-moses \
           compat-nlp-de \
+          compat-nlp-el \
           m1 \
           relation \
           test \
@@ -20,6 +21,7 @@ libtool_common_la_LIBADD = \
     cli/libtool-common-cli.la \
     compat-moses/libtool-common-compat-moses.la \
     compat-nlp-de/libtool-common-compat-nlp-de.la \
+    compat-nlp-el/libtool-common-compat-nlp-el.la \
     m1/libtool-common-m1.la \
     relation/libtool-common-relation.la \
     text-formats/libtool-common-text-formats.la

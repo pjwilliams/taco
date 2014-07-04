@@ -4,8 +4,6 @@
 
 #include "taco/base/exception.h"
 
-#include "tools-common/compat-nlp-de/bitpar.h"
-
 namespace taco {
 namespace tool {
 namespace de {

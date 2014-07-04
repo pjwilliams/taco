@@ -58,6 +58,7 @@ AC_CONFIG_FILES([Makefile
                  tools-common/compat-moses/test/Makefile
                  tools-common/compat-nlp-de/Makefile
                  tools-common/compat-nlp-de/test/Makefile
+                 tools-common/compat-nlp-el/Makefile
                  tools-common/m1/Makefile
                  tools-common/m1/test/Makefile
                  tools-common/relation/Makefile
