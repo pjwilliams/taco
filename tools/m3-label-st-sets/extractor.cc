@@ -76,11 +76,16 @@ void Extractor::Extract(Tree &t, std::vector<std::string> &warnings) {
     return;
   }
 
-  // Create a new relation and add the noun.
+  // Create a new relation.
   boost::shared_ptr<Relation> r(new Relation());
   relation_vec_.push_back(r);
+
+  // Add the noun.
   AddNodeToRelation(t, *r);
   AddNodeToRelation(*(t.GetChild(0)), *r);
+
+  // Add the parent node.
+  AddNodeToRelation(*(t.parent()), *r);
 
   // Add any Det / Aj siblings to the relation, terminating after the first Det.
   while (true) {
