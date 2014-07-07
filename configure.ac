@@ -76,6 +76,7 @@ AC_CONFIG_FILES([Makefile
                  tools/m1-extract-lexicon/Makefile
                  tools/m1-extract-vocab/Makefile
                  tools/m1-label-st-sets/Makefile
+                 tools/m3-label-st-sets/Makefile
                  tools/match-constraints-to-rules/Makefile
                  tools/prune-redundant-constraints/Makefile
                  tools/repair-lexicon/Makefile])

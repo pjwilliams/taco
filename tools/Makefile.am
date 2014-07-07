@@ -8,6 +8,7 @@ SUBDIRS = add-constraint-ids \
           m1-extract-lexicon \
           m1-extract-vocab \
           m1-label-st-sets \
+          m3-label-st-sets \
           match-constraints-to-rules \
           prune-redundant-constraints \
           repair-lexicon
