@@ -183,9 +183,10 @@ void Extractor::AddAjSubtreeToRelation(Tree &t, Relation &r) {
   AddNodeToRelation(t, r);
   for (std::vector<Tree *>::const_iterator p = t.children().begin();
        p != t.children().end(); ++p) {
-    if (IsAj(**p)) {
-      AddNodeToRelation(t, r);
-      AddNodeToRelation(*(t.GetChild(0)), r);
+    Tree *child = *p;
+    if (IsAj(*child)) {
+      AddNodeToRelation(*child, r);
+      AddNodeToRelation(*(child->GetChild(0)), r);
     }
   }
 }
