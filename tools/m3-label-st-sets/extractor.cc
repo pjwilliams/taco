@@ -90,7 +90,13 @@ void Extractor::Extract(Tree &t, std::vector<std::string> &warnings) {
   // Add any Det / Aj siblings to the relation, terminating after the first Det.
   while (true) {
     if (IsDet(*left_sibling)) {
-      AddUnaryChainToRelation(*left_sibling, *r);
+      try {
+        AddUnaryChainToRelation(*left_sibling, *r);
+      } catch(const Exception &e) {
+        std::ostringstream msg;
+        msg << "failed to add Det chain to relation: " << e.msg();
+        warnings.push_back(msg.str());
+      }
       break;
     }
     if (DominatesAj(*left_sibling)) {
@@ -163,7 +169,9 @@ void Extractor::AddNodeToRelation(Tree &t, Relation &r) {
 
 void Extractor::AddUnaryChainToRelation(Tree &t, Relation &r) {
   const std::vector<Tree *> &children = t.children();
-  assert(children.size() <= 1);
+  if (children.size() > 1) {
+    throw Exception("unary chain is not unary");
+  }
   if (children.size() == 1) {
     AddUnaryChainToRelation(*children[0], r);
   }
