@@ -17,10 +17,10 @@ Extractor::Extractor(Vocabulary &feature_set, Vocabulary &value_set,
     , options_(options) {
   // "CAT"
   cat_path_.push_back(feature_set_.Insert("CAT"));
-  // "AGR"
-  agr_path_.push_back(feature_set_.Insert("AGR"));
-  // "AGR,CASE"
-  case_path_.push_back(feature_set_.Insert("AGR"));
+  // "AGREEMENT"
+  agr_path_.push_back(feature_set_.Insert("AGREEMENT"));
+  // "AGREEMENT,CASE"
+  case_path_.push_back(feature_set_.Insert("AGREEMENT"));
   case_path_.push_back(feature_set_.Insert("CASE"));
 }
 
@@ -100,19 +100,21 @@ void Extractor::Extract(const TreeFragment &fragment,
     }
 
     // Produce an AbsConstraint for each word.
-    for (RelationVec::const_iterator q = relation_vec.begin();
-         q != relation_vec.end(); ++q) {
-      const Tree &node = **q;
-      if (!node.IsLeaf()) {
-        continue;
+    if (!options_.no_cat) {
+      for (RelationVec::const_iterator q = relation_vec.begin();
+           q != relation_vec.end(); ++q) {
+        const Tree &node = **q;
+        if (!node.IsLeaf()) {
+          continue;
+        }
+        PathTerm lhs(constraint_index_map_[&node], cat_path_);
+        const Tree &preterminal = *(node.parent());
+        std::string pos = preterminal.label().get<kIdxCat>();
+        ValueTerm rhs(value_set_.Insert(pos));
+        boost::shared_ptr<AbsConstraint> ac(new AbsConstraint(lhs, rhs));
+        cs->abs_set().Insert(ac);
+        ++num_abs_constraints;
       }
-      PathTerm lhs(constraint_index_map_[&node], cat_path_);
-      const Tree &preterminal = *(node.parent());
-      std::string pos = preterminal.label().get<kIdxCat>();
-      ValueTerm rhs(value_set_.Insert(pos));
-      boost::shared_ptr<AbsConstraint> ac(new AbsConstraint(lhs, rhs));
-      cs->abs_set().Insert(ac);
-      ++num_abs_constraints;
     }
 
     typedef m1::CaseTable::ProbabilityFunction ProbabilityFunction;

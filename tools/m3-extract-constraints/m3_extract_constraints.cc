@@ -172,6 +172,8 @@ void ExtractConstraints::ProcessOptions(int argc, char *argv[],
     ("case-model-hc",
         po::value(&options.case_model_threshold),
         "hard case constraint with arg as threshold probability")
+    ("no-cat",
+        "do not produce CAT constraints")
     ("output,o",
         po::value(&options.output_file),
         "write to arg instead of standard output")
@@ -228,6 +230,9 @@ void ExtractConstraints::ProcessOptions(int argc, char *argv[],
   // Process remaining options.
   if (vm.count("retain-lexical")) {
     options.retain_lexical = true;
+  }
+  if (vm.count("no-cat")) {
+    options.no_cat = true;
   }
 }
 
