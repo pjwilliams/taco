@@ -31,6 +31,8 @@ class Extractor {
   void BuildConstraintIndexMap(const TreeFragment &,
                                ConstraintIndexMap &) const;
 
+  bool MapPosTag(std::string &) const;
+
   Vocabulary &feature_set_;
   Vocabulary &value_set_;
   const Options &options_;

@@ -110,6 +110,11 @@ void Extractor::Extract(const TreeFragment &fragment,
         PathTerm lhs(constraint_index_map_[&node], cat_path_);
         const Tree &preterminal = *(node.parent());
         std::string pos = preterminal.label().get<kIdxCat>();
+        if (options_.map_cat_values) {
+          if (!MapPosTag(pos)) {
+            continue;  // Skip constraint if we don't know how to map the tag.
+          }
+        }
         ValueTerm rhs(value_set_.Insert(pos));
         boost::shared_ptr<AbsConstraint> ac(new AbsConstraint(lhs, rhs));
         cs->abs_set().Insert(ac);
@@ -156,6 +161,19 @@ void Extractor::Extract(const TreeFragment &fragment,
       constraint_sets.push_back(cs);
     }
   }
+}
+
+bool Extractor::MapPosTag(std::string &tag) const {
+  if (tag == "NoCm") {
+    tag = "noun";
+  } else if (tag == "AtDf" || tag == "AtId") {
+    tag = "article";
+  } else if (tag == "Aj") {
+    tag = "adjective";
+  } else {
+    return false;
+  }
+  return true;
 }
 
 }  // namespace m3

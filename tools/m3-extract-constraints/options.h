@@ -11,6 +11,7 @@ struct Options {
  public:
   Options()
       : case_model_threshold(-1)
+      , map_cat_values (false)
       , no_cat (false)
       , retain_lexical(false) {}
 
@@ -21,6 +22,7 @@ struct Options {
   // Other options.
   float case_model_threshold;
   std::string case_table_file;
+  bool map_cat_values;
   bool no_cat;
   std::string output_file;
   bool retain_lexical;
