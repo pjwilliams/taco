@@ -27,21 +27,25 @@ class Extractor {
   typedef std::vector<RelationSP> RelationVec;
 
   Tree *ClosestLeftSibling(const Tree &);
+  Tree *ClosestRightSibling(const Tree &);
 
-  bool DominatesAj(const Tree &);
+  bool Dominates(const Tree &, const std::string &);
 
   void Extract(Tree &, std::vector<std::string> &);
 
+  void PnReRule(Tree &, std::vector<std::string> &);
+  void PnDmRuleB(Tree &, std::vector<std::string> &);
+
   bool IsAj(const Tree &);
+  bool IsCat(const Tree &, const std::string &);
   bool IsDet(const Tree &);
   bool IsModifier(const Tree &);
-  bool IsNoCm(const Tree &);
+  bool IsNoun(const Tree &);
+  bool IsPos(const Tree &, const std::string &);
+  bool IsSubject(const Tree &);
 
-  bool IsNonBranching(const Tree &);
-
-  void AddAjSubtreeToRelation(Tree &, Relation &);
+  void AddSubtreeToRelation(Tree &, const std::string &, Relation &);
   void AddNodeToRelation(Tree &, Relation &);
-  void AddUnaryChainToRelation(Tree &, Relation &);
 
   NodeToRelationMap node_to_relation_;
   RelationVec relation_vec_;

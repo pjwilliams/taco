@@ -164,12 +164,16 @@ void Extractor::Extract(const TreeFragment &fragment,
 }
 
 bool Extractor::MapPosTag(std::string &tag) const {
-  if (tag == "NoCm") {
+  if (tag == "NoCm" || tag == "NoPr") {
     tag = "noun";
-  } else if (tag == "AtDf" || tag == "AtId") {
+  } else if (tag == "AtDf" || tag == "AtId" || tag == "AsPpPa") {
     tag = "article";
-  } else if (tag == "Aj") {
+  } else if (tag == "Aj" || tag == "NmOd") {
     tag = "adjective";
+  } else if (tag == "VbMn") {
+    tag = "verb";
+  } else if (tag == "PnId" || tag == "PnRe" || tag == "PnDm") {
+    tag = "pronoun";
   } else {
     return false;
   }
