@@ -98,19 +98,21 @@ void Extractor::Extract(Tree &t, std::vector<std::string> &warnings) {
 
   // Look for AtId / AtDf / AsPpPa / PnId / Aj siblings to the left of the noun.
 
-  Tree *det = 0;
+  std::vector<Tree *> det;
   std::vector<Tree *> non_det;
 
   while (left_sibling) {
     if (Dominates(*left_sibling, "AtId")) {
-      det = left_sibling;
+      det.push_back(left_sibling);
       break;
     } else if (Dominates(*left_sibling, "AtDf")) {
-      det = left_sibling;
+      det.push_back(left_sibling);
       break;
     } else if (Dominates(*left_sibling, "AsPpPa")) {
-      det = left_sibling;
+      det.push_back(left_sibling);
       break;
+    } else if (Dominates(*left_sibling, "NmCd")) {
+      det.push_back(left_sibling);
     } else if (Dominates(*left_sibling, "PnId")) {
       non_det.push_back(left_sibling);
     } else if (Dominates(*left_sibling, "Aj")) {
@@ -147,7 +149,7 @@ void Extractor::Extract(Tree &t, std::vector<std::string> &warnings) {
 
   Tree *as_pp_pa = 0;
   // AsPpPa rule.
-  if (!det) {
+  if (det.empty()) {
     Tree *left_grand_sibling = ClosestLeftSibling(*noun->parent());
     if (left_grand_sibling && IsPos(*left_grand_sibling, "AsPpPa")) {
       as_pp_pa = left_grand_sibling;
@@ -155,7 +157,7 @@ void Extractor::Extract(Tree &t, std::vector<std::string> &warnings) {
   }
 
   // If we've found nothing but a noun then do nothing.
-  if (!det && non_det.empty() && !pn_dm && !vb_mn && !as_pp_pa) {
+  if (det.empty() && non_det.empty() && !pn_dm && !vb_mn && !as_pp_pa) {
     return;
   }
 
@@ -188,14 +190,17 @@ void Extractor::Extract(Tree &t, std::vector<std::string> &warnings) {
     }
   }
 
-  // Add the determiner (if any).
-  if (det) {
-    if (Dominates(*det, "AtId")) {
-      AddSubtreeToRelation(*det, "AtId", *r);
-    } else if (Dominates(*det, "AtDf")) {
-      AddSubtreeToRelation(*det, "AtDf", *r);
-    } else if (Dominates(*det, "AsPpPa")) {
-      AddSubtreeToRelation(*det, "AsPpPa", *r);
+  // Add determiners (if any).
+  for (std::vector<Tree *>::const_iterator p = det.begin();
+       p != det.end(); ++p) {
+    if (Dominates(**p, "AtId")) {
+      AddSubtreeToRelation(**p, "AtId", *r);
+    } else if (Dominates(**p, "AtDf")) {
+      AddSubtreeToRelation(**p, "AtDf", *r);
+    } else if (Dominates(**p, "AsPpPa")) {
+      AddSubtreeToRelation(**p, "AsPpPa", *r);
+    } else if (Dominates(**p, "NmCd")) {
+      AddSubtreeToRelation(**p, "NmCd", *r);
     }
   }
 
@@ -284,7 +289,7 @@ bool Extractor::IsModifier(const Tree &t) {
   }
   const std::string &cat = t.label().get<kIdxCat>();
   return cat == "Aj" || cat == "AtDf" || cat == "AtId" || cat == "AsPpPa" ||
-         cat == "PnId";
+         cat == "NmCd" || cat == "PnId";
 }
 
 bool Extractor::IsSubject(const Tree &t) {

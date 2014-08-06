@@ -166,7 +166,8 @@ void Extractor::Extract(const TreeFragment &fragment,
 bool Extractor::MapPosTag(std::string &tag) const {
   if (tag == "NoCm" || tag == "NoPr") {
     tag = "noun";
-  } else if (tag == "AtDf" || tag == "AtId" || tag == "AsPpPa") {
+  } else if (tag == "AtDf" || tag == "AtId" || tag == "AsPpPa" ||
+             tag == "NmCd") {
     tag = "article";
   } else if (tag == "Aj" || tag == "NmOd") {
     tag = "adjective";
