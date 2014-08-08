@@ -20,7 +20,13 @@ void Extractor::Extract(Tree &t, std::set<Relation> &relations,
   // Visit nodes extracting noun-modifier agreement relations.
   for (std::vector<Tree *>::const_iterator p = t.children().begin();
        p != t.children().end(); ++p) {
-    Extract(**p, warnings);
+    ApplyNounModifierRule(**p, warnings);
+  }
+
+  // Visit nodes extracting subject-verb agreement relations.
+  for (std::vector<Tree *>::const_iterator p = t.children().begin();
+       p != t.children().end(); ++p) {
+    ApplySubjectVerbRule(**p, warnings);
   }
 
   // Add relations to output set.
@@ -45,7 +51,7 @@ void Extractor::Extract(Tree &t, std::set<Relation> &relations,
     Tree *preterminal = leaf->parent();
     if (IsNoun(*preterminal) || IsModifier(*preterminal) ||
         IsPos(*preterminal, "VbMn") || IsPos(*preterminal, "PnDm") ||
-        IsPos(*preterminal, "PnRe")) {
+        IsPos(*preterminal, "PnRe") || IsPos(*preterminal, "PnPe")) {
       Relation r;
       AddNodeToRelation(*preterminal, r);
       AddNodeToRelation(*leaf, r);
@@ -54,22 +60,17 @@ void Extractor::Extract(Tree &t, std::set<Relation> &relations,
   }
 }
 
-void Extractor::Extract(Tree &t, std::vector<std::string> &warnings) {
+void Extractor::ApplyNounModifierRule(Tree &t,
+                                      std::vector<std::string> &warnings) {
   // Recursively visit children first.
   for (std::vector<Tree *>::const_iterator p = t.children().begin();
        p != t.children().end(); ++p) {
-    Extract(**p, warnings);
+    ApplyNounModifierRule(**p, warnings);
   }
 
   // PnRe rule
   if (IsPos(t, "PnRe")) {
     PnReRule(t, warnings);
-    return;
-  }
-
-  // PnDm rule (second part)
-  if (IsPos(t, "PnDm") && IsSubject(*t.parent())) {
-    PnDmRuleB(t, warnings);
     return;
   }
 
@@ -85,8 +86,8 @@ void Extractor::Extract(Tree &t, std::vector<std::string> &warnings) {
   if (left_sibling && IsNoun(*left_sibling)) {
     // If the sibling is also a noun then ignore this one.  Any modifiers
     // to the left will agree with that noun, not this one.  A relation will
-    // be extracted for that noun during another call to Extract() (if it
-    // hasn't already).
+    // be extracted for that noun during another call to ApplyNounModifierRule()
+    // (if it hasn't already).
     return;
   }
   if (left_sibling &&
@@ -133,20 +134,6 @@ void Extractor::Extract(Tree &t, std::vector<std::string> &warnings) {
     }
   }
 
-  // If parent is Sb then look for verb
-  Tree *vb_mn = 0;
-  if (IsSubject(*t.parent())) {
-    if (Tree *right_sibling = ClosestRightSibling(*t.parent())) {
-      if (IsPos(*right_sibling, "VbMn")) {
-        vb_mn = right_sibling;
-      } else if ((right_sibling = ClosestRightSibling(*right_sibling))) {
-        if (IsPos(*right_sibling, "VbMn")) {
-          vb_mn = right_sibling;
-        }
-      }
-    }
-  }
-
   Tree *as_pp_pa = 0;
   // AsPpPa rule.
   if (det.empty()) {
@@ -157,7 +144,7 @@ void Extractor::Extract(Tree &t, std::vector<std::string> &warnings) {
   }
 
   // If we've found nothing but a noun then do nothing.
-  if (det.empty() && non_det.empty() && !pn_dm && !vb_mn && !as_pp_pa) {
+  if (det.empty() && non_det.empty() && !pn_dm && !as_pp_pa) {
     return;
   }
 
@@ -214,11 +201,95 @@ void Extractor::Extract(Tree &t, std::vector<std::string> &warnings) {
     AddNodeToRelation(*as_pp_pa, *r);
     AddNodeToRelation(*(as_pp_pa->GetChild(0)), *r);
   }
+}
 
-  // Add the VbMn if any
+void Extractor::ApplySubjectVerbRule(Tree &t,
+                                     std::vector<std::string> &warnings) {
+  // Recursively visit children first.
+  for (std::vector<Tree *>::const_iterator p = t.children().begin();
+       p != t.children().end(); ++p) {
+    ApplySubjectVerbRule(**p, warnings);
+  }
+
+  // Check if this is a SB node.
+  if (!IsSubject(t)) {
+    return;
+  }
+
+  // Add the SB to relation (if doesn't belong to one already).
+  Relation *relation = 0;
+  NodeToRelationMap::iterator p = node_to_relation_.find(&t);
+  if (p != node_to_relation_.end()) {
+    relation = p->second;
+  } else {
+    boost::shared_ptr<Relation> r(new Relation());
+    relation_vec_.push_back(r);
+    AddNodeToRelation(t, *r);
+    relation = r.get();
+  }
+
+  // Add the noun.
+  if (Dominates(t, "NoCm")) {
+    AddSubtreeToRelation(t, "NoCm", *relation);
+  } else if (Dominates(t, "NoPr")) {
+    AddSubtreeToRelation(t, "NoPr", *relation);
+  } else if (Dominates(t, "PnDm")) {
+    AddSubtreeToRelation(t, "PnDm", *relation);
+  } else if (Dominates(t, "PnRe")) {
+    AddSubtreeToRelation(t, "PnRe", *relation);
+  } else if (Dominates(t, "PnPe")) {
+    AddSubtreeToRelation(t, "PnPe", *relation);
+  }
+
+  // Copulative verb rule
+  if (Tree *right_sibling = ClosestRightSibling(t)) {
+    if (IsPos(*right_sibling, "VbMn")) {
+      const std::string &w = right_sibling->GetChild(0)->label().get<kIdxCat>();
+      if (w == "είναι" || w == "ήταν" || w == "είναι" || w == "ήταν") {
+        if (Tree *right_sibling_2 = ClosestRightSibling(*right_sibling)) {
+          if (Dominates(*right_sibling_2, "Aj")) {
+            AddSubtreeToRelation(*right_sibling_2, "Aj", *relation);
+          } else if (Dominates(*right_sibling_2, "PnId")) {
+            AddSubtreeToRelation(*right_sibling_2, "PnId", *relation);
+          }
+        }
+        return;
+      }
+    }
+  }
+
+  // Look for an auxiliary verb to the right.
+  Tree *aux_v = 0;
+  if (Tree *right_sibling = ClosestRightSibling(t)) {
+    if (IsCat(*right_sibling, "AuxV") && Dominates(*right_sibling, "VbMn")) {
+      aux_v = right_sibling;
+    } else if ((right_sibling = ClosestRightSibling(*right_sibling))) {
+      if (IsCat(*right_sibling, "AuxV") && Dominates(*right_sibling, "VbMn")) {
+        aux_v = right_sibling;
+      }
+    }
+  }
+  // Add the auxiliary verb if found.
+  if (aux_v) {
+    AddSubtreeToRelation(*aux_v, "VbMn", *relation);
+    return;
+  }
+
+  // If parent is Sb then look for verb
+  Tree *vb_mn = 0;
+  if (Tree *right_sibling = ClosestRightSibling(t)) {
+    if (IsPos(*right_sibling, "VbMn")) {
+      vb_mn = right_sibling;
+    } else if ((right_sibling = ClosestRightSibling(*right_sibling))) {
+      if (IsPos(*right_sibling, "VbMn")) {
+        vb_mn = right_sibling;
+      }
+    }
+  }
+  // Add the VbMn if found.
   if (vb_mn) {
-    AddNodeToRelation(*vb_mn, *r);
-    AddNodeToRelation(*(vb_mn->GetChild(0)), *r);
+    AddNodeToRelation(*vb_mn, *relation);
+    AddNodeToRelation(*(vb_mn->GetChild(0)), *relation);
   }
 }
 
@@ -227,9 +298,10 @@ void Extractor::PnReRule(Tree &t, std::vector<std::string> &warnings) {
   boost::shared_ptr<Relation> r(new Relation());
   relation_vec_.push_back(r);
 
-  // Add the PnRe.
+  // Add the PnRe and its parent.
   AddNodeToRelation(t, *r);
   AddNodeToRelation(*(t.GetChild(0)), *r);
+  AddNodeToRelation(*(t.parent()), *r);
 
   // Look for the closest sibling to the left.
   Tree *left_sibling = ClosestLeftSibling(t);
@@ -299,17 +371,17 @@ bool Extractor::IsSubject(const Tree &t) {
   return t.label().get<kIdxCat>() == "Sb";
 }
 
-bool Extractor::Dominates(const Tree &t, const std::string &pos) {
+const Tree *Extractor::Dominates(const Tree &t, const std::string &pos) {
   if (t.IsLeaf() || t.IsPreterminal()) {
-    return false;
+    return 0;
   }
   for (std::vector<Tree *>::const_iterator p = t.children().begin();
        p != t.children().end(); ++p) {
     if (IsPos(**p, pos)) {
-      return true;
+      return *p;
     }
   }
-  return false;
+  return 0;
 }
 
 // Return a pointer to the sibling immediately to the left of t or 0 if none.

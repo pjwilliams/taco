@@ -26,12 +26,13 @@ class Extractor {
   typedef boost::unordered_map<const Tree *, Relation *> NodeToRelationMap;
   typedef std::vector<RelationSP> RelationVec;
 
+  void ApplyNounModifierRule(Tree &, std::vector<std::string> &);
+  void ApplySubjectVerbRule(Tree &, std::vector<std::string> &);
+
   Tree *ClosestLeftSibling(const Tree &);
   Tree *ClosestRightSibling(const Tree &);
 
-  bool Dominates(const Tree &, const std::string &);
-
-  void Extract(Tree &, std::vector<std::string> &);
+  const Tree *Dominates(const Tree &, const std::string &);
 
   void PnReRule(Tree &, std::vector<std::string> &);
   void PnDmRuleB(Tree &, std::vector<std::string> &);

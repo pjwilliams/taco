@@ -173,7 +173,7 @@ bool Extractor::MapPosTag(std::string &tag) const {
     tag = "adjective";
   } else if (tag == "VbMn") {
     tag = "verb";
-  } else if (tag == "PnId" || tag == "PnRe" || tag == "PnDm") {
+  } else if (tag == "PnId" || tag == "PnRe" || tag == "PnDm" || tag == "PnPe") {
     tag = "pronoun";
   } else {
     return false;
