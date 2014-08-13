@@ -108,6 +108,8 @@ void LabelSTSets::ProcessOptions(int argc, char *argv[],
     ("output,o",
         po::value(&options.output_file),
         "write to arg instead of standard output")
+    ("no-subject-verb",
+        "suppress subject verb agreement")
   ;
 
   // Declare the command line options that are hidden from the user
@@ -142,6 +144,11 @@ void LabelSTSets::ProcessOptions(int argc, char *argv[],
   if (vm.count("help")) {
     std::cout << visible << usage_bottom.str() << std::endl;
     std::exit(0);
+  }
+
+  // Process remaining options.
+  if (vm.count("no-subject-verb")) {
+    options.subject_verb = false;
   }
 }
 

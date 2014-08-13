@@ -24,9 +24,11 @@ void Extractor::Extract(Tree &t, std::set<Relation> &relations,
   }
 
   // Visit nodes extracting subject-verb agreement relations.
-  for (std::vector<Tree *>::const_iterator p = t.children().begin();
-       p != t.children().end(); ++p) {
-    ApplySubjectVerbRule(**p, warnings);
+  if (options_.subject_verb) {
+    for (std::vector<Tree *>::const_iterator p = t.children().begin();
+         p != t.children().end(); ++p) {
+      ApplySubjectVerbRule(**p, warnings);
+    }
   }
 
   // Add relations to output set.

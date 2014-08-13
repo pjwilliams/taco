@@ -9,13 +9,14 @@ namespace m3 {
 
 struct Options {
  public:
-  Options() {}
+  Options() : subject_verb(true) {}
 
   // Positional options.
   std::string input_file;
 
   // Other options.
   std::string output_file;
+  bool subject_verb;
 };
 
 }  // namespace m3

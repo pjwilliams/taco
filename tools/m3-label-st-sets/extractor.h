@@ -16,7 +16,7 @@ namespace m3 {
 
 class Extractor {
  public:
-  Extractor(const Options &) {}  // Options not currently used.
+  Extractor(const Options &options) : options_(options) {}
   ~Extractor() {}
 
   void Extract(Tree &, std::set<Relation> &, std::vector<std::string> &);
@@ -50,6 +50,7 @@ class Extractor {
 
   NodeToRelationMap node_to_relation_;
   RelationVec relation_vec_;
+  const Options &options_;
 };
 
 }  // namespace m3
