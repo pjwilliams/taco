@@ -64,7 +64,7 @@ const Tag TagSet::s_vvizu(51);
 const Tag TagSet::s_vvpp(52);
 const Tag TagSet::s_xy(53);
 const Tag TagSet::s_punc_comma(54);
-const Tag TagSet::s_punc_final(54);
+const Tag TagSet::s_punc_final(55);
 const Tag TagSet::s_punc_other(56);
 const Tag TagSet::s_ns_nne(57);
 const Tag TagSet::s_ns_trunc_cap(58);
