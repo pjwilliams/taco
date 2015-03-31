@@ -40,6 +40,7 @@ Interpreter::Interpreter(const Options &options,
   relation_pos_tags_.insert(de::stts::TagSet::s_pposat);
   relation_pos_tags_.insert(de::stts::TagSet::s_pwat);
   relation_pos_tags_.insert(de::stts::TagSet::s_nn);
+  relation_pos_tags_.insert(de::stts::TagSet::s_ns_segment);
   relation_pos_tags_.insert(de::stts::TagSet::s_vafin);
   relation_pos_tags_.insert(de::stts::TagSet::s_vmfin);
   relation_pos_tags_.insert(de::stts::TagSet::s_vvfin);
