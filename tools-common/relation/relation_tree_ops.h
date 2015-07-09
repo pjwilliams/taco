@@ -64,8 +64,8 @@ void ClearIds(TreeType &t) {
 template<typename TreeType, int N, typename RelationMapType>
 void ExtractRelations(const TreeType &t, RelationMapType &relation_map) {
   RelationId id = boost::tuples::get<N>(t.label());
-  if (id != -1) {
-    relation_map[id].nodes.insert(&t);
+  if (id.value() != -1) {
+    relation_map[id.value()].nodes.insert(&t);
   }
   const std::vector<TreeType *> &children = t.children();
   for (typename std::vector<TreeType *>::const_iterator p = children.begin();
@@ -81,8 +81,8 @@ void ExtractRelations(const TreeType &t, RelationMapType &relation_map) {
 template<typename TreeType, int N, typename RelationMapType>
 void ExtractRelations(TreeType &t, RelationMapType &relation_map) {
   RelationId id = boost::tuples::get<N>(t.label());
-  if (id != -1) {
-    relation_map[id].nodes.insert(&t);
+  if (id.value() != -1) {
+    relation_map[id.value()].nodes.insert(&t);
   }
   std::vector<TreeType *> &children = t.children();
   for (typename std::vector<TreeType *>::const_iterator p = children.begin();

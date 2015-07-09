@@ -44,7 +44,7 @@ void TreeContext::BuildCaseModelMap(const Tree &root, CaseModelMap &map) const {
   const m1::CaseTable::ProbabilityFunction *distribution =
     case_table_->Lookup(key);
   if (distribution) {
-    int id = root.label().get<kIdxId>();
+    int id = root.label().get<kIdxId>().value();
     // TODO check ID isn't already in map
     if (id != -1) {
       map[id] = std::make_pair(&root, distribution);

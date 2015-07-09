@@ -9,9 +9,13 @@ namespace tool {
 class RelationId {
  public:
   RelationId() : value_(-1) {}
-  RelationId(int v) : value_(v) {}
+  explicit RelationId(int v) : value_(v) {}
   RelationId &operator=(int i) { value_ = i; return *this; }
-  operator int() const { return value_; }
+
+  // FIXME
+  //operator int() const { return value_; }
+  int value() const { return value_; }
+
  private:
   int value_;
 };

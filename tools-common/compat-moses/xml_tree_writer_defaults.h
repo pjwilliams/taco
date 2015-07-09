@@ -83,8 +83,8 @@ class TupleTreeAttrWriter<TreeType, N, RelationId> {
 
   void operator()(const TreeType &node, AttrMap &attr_map) const {
     RelationId id = boost::tuples::get<N>(node.label());
-    if (id >= 0) {
-      std::string s = boost::lexical_cast<std::string>(id);
+    if (id.value() >= 0) {
+      std::string s = boost::lexical_cast<std::string>(id.value());
       attr_map[name_] = s;
     }
   }

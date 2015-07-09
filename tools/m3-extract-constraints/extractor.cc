@@ -50,14 +50,14 @@ void Extractor::Extract(const TreeFragment &fragment,
 
   // Group nodes into sets according to relation ID.
   FragmentRelationMap relations;
-  int id = fragment.root->label().get<kIdxId>();
+  int id = fragment.root->label().get<kIdxId>().value();
   if (id != -1) {
     relations[id].push_back(fragment.root);
   }
   for (std::vector<Tree *>::const_iterator p = fragment.leaves.begin();
        p != fragment.leaves.end(); ++p) {
     Tree &node = **p;
-    int id = node.label().get<kIdxId>();
+    int id = node.label().get<kIdxId>().value();
     if (id != -1) {
       relations[id].push_back(&node);
     }
