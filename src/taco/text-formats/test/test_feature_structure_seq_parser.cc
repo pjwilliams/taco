@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE(TestFeatureStructureSeqParser) {
   // FeatureStructures in seq.
   FeatureStructureParser fs_parser(feature_set, value_set);
 
-  FeatureStructureOrderer orderer;
+  BadFeatureStructureOrderer orderer;
 
   boost::shared_ptr<FeatureStructure> fs0 = fs_parser.Parse(s0);
   // TODO Write equality function for feature structures.

@@ -680,7 +680,7 @@ BOOST_AUTO_TEST_CASE(TestFeatureStructure7) {
   BOOST_CHECK(fs1->GetAtomicValue() == t);
 }
 
-BOOST_AUTO_TEST_CASE(TestFeatureStructureOrderer) {
+BOOST_AUTO_TEST_CASE(TestBadFeatureStructureOrderer) {
   using namespace taco;
   using namespace boost::assign;
 
@@ -739,7 +739,7 @@ BOOST_AUTO_TEST_CASE(TestFeatureStructureOrderer) {
     fs5.reset(new FeatureStructure(spec));
   }
 
-  FeatureStructureOrderer orderer;
+  BadFeatureStructureOrderer orderer;
 
   BOOST_CHECK(!orderer(*fs1, *fs1));
   BOOST_CHECK(orderer(*fs1, *fs2));
@@ -771,7 +771,7 @@ BOOST_AUTO_TEST_CASE(TestFeatureStructureOrderer) {
   BOOST_CHECK(!orderer(*fs5, *fs4));
   BOOST_CHECK(!orderer(*fs5, *fs5));
 
-  typedef DereferencingOrderer<SPFS, FeatureStructureOrderer> Orderer;
+  typedef DereferencingOrderer<SPFS, BadFeatureStructureOrderer> Orderer;
 
   std::set<SPFS, Orderer> fs_set;
 

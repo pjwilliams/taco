@@ -1,20 +1,20 @@
-#ifndef TACO_SRC_TACO_FEATURE_STRUCTURE_SET_H_
-#define TACO_SRC_TACO_FEATURE_STRUCTURE_SET_H_
-
-#include <set>
+#ifndef TACO_SRC_TACO_BAD_UNORDERED_FEATURE_STRUCTURE_SET_H_
+#define TACO_SRC_TACO_BAD_UNORDERED_FEATURE_STRUCTURE_SET_H_
 
 #include <boost/shared_ptr.hpp>
+#include <boost/unordered_set.hpp>
 
 #include "taco/base/utility.h"
 #include "taco/feature_structure.h"
 
 namespace taco {
 
-class FeatureStructureSet {
+class BadUnorderedFeatureStructureSet {
  public:
   typedef boost::shared_ptr<const FeatureStructure> value_type;
-  typedef DereferencingOrderer<value_type, FeatureStructureOrderer> Orderer;
-  typedef std::set<value_type, Orderer> SetType;
+  typedef DereferencingHasher<value_type, BadFeatureStructureHasher> Hash;
+  typedef DereferencingOrderer<value_type, BadFeatureStructureEqualityPred> Equal;
+  typedef boost::unordered_set<value_type, Hash, Equal> SetType;
   typedef SetType::iterator iterator;
   typedef SetType::const_iterator const_iterator;
 

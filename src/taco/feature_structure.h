@@ -124,8 +124,10 @@ class FeatureStructure {
   //bool subsumes(const FeatureStructure &) const;
 
  private:
-  friend class FeatureStructureOrderer;
   friend struct internal::FSContent;
+  friend class BadFeatureStructureOrderer;
+  friend class BadFeatureStructureHasher;
+  friend class BadFeatureStructureEqualityPred;
 
   typedef boost::unordered_map<boost::shared_ptr<FeatureStructure>,
                                boost::shared_ptr<FeatureStructure> > CloneMap;
@@ -183,7 +185,35 @@ class FeatureStructure {
   internal::FSContent *content_;
 };
 
-class FeatureStructureOrderer {
+// WARNING Do not use BadFeatureStructureOrderer if you care about structure
+// sharing differences.
+//
+// Defines a (completely arbitrary) strict weak ordering between
+// FeatureStructures so they can be stored in std::sets and suchlike.  It's
+// a 'bad' ordering function because it doesn't distinguish between structure
+// sharing differences.  In other words, it compares the feature structures as
+// if they were trees, not graphs, and so is broken for general feature
+// structures.
+class BadFeatureStructureOrderer {
+ public:
+  bool operator()(const FeatureStructure &, const FeatureStructure &) const;
+};
+
+// Hash function for use with boost::unordered_set, etc.  It's 'bad' because
+// its expensive and it ignores structure sharing differences (not a problem
+// if structure-sharing related collisions will be rare but not ideal either).
+class BadFeatureStructureHasher {
+ public:
+  std::size_t operator()(const FeatureStructure &) const;
+};
+
+// WARNING Do not use BadFeatureStructureEqualityPred if you care about
+// structure sharing differences.
+//
+// Equality predicate for FeatureStructures.  Like BadFeatureStructureOrderer,
+// it doesn't distinguish between structure sharing differences, treating the
+// FeatureStructures as if they were trees.
+class BadFeatureStructureEqualityPred {
  public:
   bool operator()(const FeatureStructure &, const FeatureStructure &) const;
 };
@@ -229,6 +259,55 @@ class ComplexContentOrderer {
  public:
   bool operator()(const FSContent &, const FSContent &) const;
 };
+
+class FSContentHasher {
+ public:
+  std::size_t operator()(const FSContent &x) const {
+    std::size_t seed = 0;
+    for (FSContent::Map::const_iterator p = x.c.begin(); p != x.c.end(); ++p) {
+      boost::hash_combine(seed, p->first);
+      hash_combine(seed, *(p->second));
+    }
+    boost::hash_combine(seed, x.a);
+    return seed;
+  };
+ private:
+  BadFeatureStructureHasher fsHasher_;
+  void hash_combine(std::size_t &seed, const FeatureStructure &fs) const {
+    // Same as boost::hash_combine but uses BadFeatureStructureHasher instead of
+    // requiring hash_value to be defined.
+    seed ^= fsHasher_(fs) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+  }
+};
+
+class FSContentEqualityPred {
+ public:
+  bool operator()(const FSContent &x, const FSContent &y) const {
+    if (x.IsAtomic()) {
+      if (!y.IsAtomic()) {
+        return false;
+      }
+      return x.a == y.a;
+    } else if (y.IsAtomic()) {
+      return false;
+    }
+    if (x.c.size() != y.c.size()) {
+      return false;
+    }
+    BadFeatureStructureEqualityPred fsPred;
+    FSContent::Map::const_iterator p = x.c.begin();
+    FSContent::Map::const_iterator q = y.c.begin();
+    while (p != x.c.end()) {
+      if (p->first != q->first || !fsPred(*p->second, *q->second)) {
+        return false;
+      }
+      ++p;
+      ++q;
+    }
+    return true;
+  };
+};
+
 
 }  // namespace internal
 

@@ -16,6 +16,16 @@ class DereferencingOrderer {
   Orderer orderer_;
 };
 
+template<typename PointerType, typename Hasher>
+class DereferencingHasher {
+ public:
+  std::size_t operator()(PointerType p) const {
+    return hasher_(*p);
+  }
+ private:
+  Hasher hasher_;
+};
+
 }  // namespace taco
 
 #endif

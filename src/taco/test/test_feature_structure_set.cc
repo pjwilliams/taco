@@ -1,6 +1,6 @@
 #include <boost/test/unit_test.hpp>
 
-#include "taco/feature_structure_set.h"
+#include "taco/bad_feature_structure_set.h"
 
 #include "taco/base/utility.h"
 #include "taco/base/vocabulary.h"
@@ -11,7 +11,7 @@
 #include <utility>
 #include <vector>
 
-BOOST_AUTO_TEST_CASE(testFeatureStructureSet) {
+BOOST_AUTO_TEST_CASE(testBadFeatureStructureSet) {
   using namespace taco;
   using namespace boost::assign;
 
@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE(testFeatureStructureSet) {
 
   boost::shared_ptr<FeatureStructure> fs1(new FeatureStructure(spec1));
 
-  FeatureStructureSet fsSet;
+  BadFeatureStructureSet fsSet;
   BOOST_CHECK(fsSet.empty());
 
   // Add fs1

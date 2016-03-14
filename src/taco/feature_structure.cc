@@ -571,7 +571,7 @@ bool ComplexContentValueOrderer::operator()(
   const FSContent::Map::value_type &a,
   const FSContent::Map::value_type &b) const {
   if (a.first == b.first) {
-    FeatureStructureOrderer orderer;
+    BadFeatureStructureOrderer orderer;
     return orderer(*a.second, *b.second);
   }
   return a.first < b.first;
@@ -586,11 +586,8 @@ bool ComplexContentOrderer::operator()(const FSContent &a,
 
 }  // namespace internal
 
-// Defines a completely arbitrary strict weak ordering between FeatureStructures
-// so they can be stored in std::sets and suchlike.  Compares atomic values
-// only: *does not* distinguish between structure sharing differences.
-bool FeatureStructureOrderer::operator()(const FeatureStructure &a,
-                                         const FeatureStructure &b) const {
+bool BadFeatureStructureOrderer::operator()(const FeatureStructure &a,
+                                            const FeatureStructure &b) const {
   if (a.IsAtomic()) {
     if (!b.IsAtomic()) {
       return true;
@@ -601,6 +598,21 @@ bool FeatureStructureOrderer::operator()(const FeatureStructure &a,
   }
   internal::ComplexContentOrderer orderer;
   return orderer(*(a.GetContent()), *(b.GetContent()));
+}
+
+std::size_t BadFeatureStructureHasher::operator()(
+    const FeatureStructure &x) const {
+  internal::FSContentHasher contentHasher;
+  internal::FSContent &content = *(x.GetContent());
+  return contentHasher(content);
+}
+
+bool BadFeatureStructureEqualityPred::operator()(
+    const FeatureStructure &x, const FeatureStructure &y) const {
+  internal::FSContentEqualityPred contentPred;
+  internal::FSContent &xContent = *(x.GetContent());
+  internal::FSContent &yContent = *(y.GetContent());
+  return contentPred(xContent, yContent);
 }
 
 }  // namespace taco

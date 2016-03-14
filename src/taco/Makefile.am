@@ -5,6 +5,8 @@ AM_CPPFLAGS = $(BOOST_CPPFLAGS) -I$(top_srcdir)/src
 lib_LTLIBRARIES = libtaco.la
 
 nobase_pkginclude_HEADERS = \
+    bad_feature_structure_set.h \
+    bad_unordered_feature_structure_set.h \
     base/basic_types.h \
     base/exception.h \
     base/numbered_set.h \
@@ -21,7 +23,6 @@ nobase_pkginclude_HEADERS = \
     feature_selection_rule.h \
     feature_selection_table.h \
     feature_structure.h \
-    feature_structure_set.h \
     feature_structure_spec.h \
     feature_tree.h \
     interpretation.h \
