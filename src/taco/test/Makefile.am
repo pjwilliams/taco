@@ -14,5 +14,4 @@ test_taco_SOURCES = \
     test_constraint_term.cc \
     test_feature_selection_table.cc \
     test_feature_structure.cc \
-    test_feature_structure_set.cc \
     test_interpretation.cc
