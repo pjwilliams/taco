@@ -9,6 +9,7 @@ nobase_pkginclude_HEADERS = \
     bad_unordered_feature_structure_set.h \
     base/basic_types.h \
     base/exception.h \
+    base/hash_combine.h \
     base/numbered_set.h \
     base/string_piece.h \
     base/string_util.h \

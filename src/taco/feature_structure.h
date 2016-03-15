@@ -9,6 +9,7 @@
 
 #include "taco/base/basic_types.h"
 #include "taco/base/exception.h"
+#include "taco/base/hash_combine.h"
 #include "taco/feature_path.h"
 #include "taco/feature_structure_spec.h"
 #include "taco/feature_tree.h"
@@ -266,18 +267,13 @@ class FSContentHasher {
     std::size_t seed = 0;
     for (FSContent::Map::const_iterator p = x.c.begin(); p != x.c.end(); ++p) {
       boost::hash_combine(seed, p->first);
-      hash_combine(seed, *(p->second));
+      hash_combine(seed, fsHasher_(*(p->second)));
     }
     boost::hash_combine(seed, x.a);
     return seed;
   };
  private:
   BadFeatureStructureHasher fsHasher_;
-  void hash_combine(std::size_t &seed, const FeatureStructure &fs) const {
-    // Same as boost::hash_combine but uses BadFeatureStructureHasher instead of
-    // requiring hash_value to be defined.
-    seed ^= fsHasher_(fs) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-  }
 };
 
 class FSContentEqualityPred {
